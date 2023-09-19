@@ -132,10 +132,10 @@ def parse_benchmark(filename):
 
 def count_total_results(predictor_score_dict, benchmark_dict):
     """
-        Calculates the total number of positives (P), or benign results, and negatives (N), or pathogenic results.
+        Calculates the total number of positives (P), or pathogenic results, and negatives (N), or benign results.
         :param predictor_score_dict: a dict of all predictor scores
         :param benchmark_dict: a dict of benchmark classifications
-        :return: a list of ints for the total number of benign and pathogenic results
+        :return: a list of ints for the total number of pathogenic and benign results
     """
 
     pathogenic = 0
@@ -146,7 +146,7 @@ def count_total_results(predictor_score_dict, benchmark_dict):
             pathogenic += 1
         elif result == 'Benign':
             benign += 1
-    return [benign, pathogenic]
+    return [pathogenic, benign]
 
 def calculate_coordinates(predictor_score_dict, benchmark_dict, out_filepath):
     """
@@ -161,6 +161,7 @@ def calculate_coordinates(predictor_score_dict, benchmark_dict, out_filepath):
     score_hgvs_pairs = [(v, k) for k, v in predictor_score_dict.items()]
 
     sorted_score_hgvs_pairs = score_hgvs_pairs
+
     #########################
     ### START CODING HERE ###
     #########################
@@ -168,10 +169,10 @@ def calculate_coordinates(predictor_score_dict, benchmark_dict, out_filepath):
     # Use the following if-statement and replace the question mark with the type of the predictor.
     # It will put the ROC curve at the correct side of the diagonal line.
 
-    # if type_predictor == ? :
-    #     sorted_score_hgvs_pairs = sorted(score_hgvs_pairs)
-    # else:
-    #     sorted_score_hgvs_pairs = sorted(score_hgvs_pairs, reverse=True)
+    if type_predictor == "sift" :
+        sorted_score_hgvs_pairs = sorted(score_hgvs_pairs, reverse=True)
+    else:
+        sorted_score_hgvs_pairs = sorted(score_hgvs_pairs)
 
     #########################
     ###  END CODING HERE  ###
@@ -181,20 +182,24 @@ def calculate_coordinates(predictor_score_dict, benchmark_dict, out_filepath):
     # need a separate list for predictor scores
     coordinate_score = [sorted_score_hgvs_pairs[0][0]]
 
-    # Create lists to store coordinates. Starts in (0,0)
+    # Create lists to store coordinates (tpr, fpr). Starts in (0,0)
     tpr = [0.0]
     fpr = [0.0]
 
     # Create variables to keep track of the number of true positives (TPs) and false positives (FPs)
-    num_benign = 0
-    num_pathogenic = 0
+    num_tp = 0
+    num_fp = 0
 
-    # Get the total number of positives (P) and negatives (N) (benign and pathogenic)
-    total_benign, total_pathogenic = count_total_results(predictor_score_dict, benchmark_dict)
+    # Get the total number of positives (P) and negatives (N)
+    total_p, total_n = count_total_results(predictor_score_dict, benchmark_dict)
 
     # Get a list of indices of scores before breakpoints
+    # A breakpoint is the place in the sorted list of scores where the score changes.
+    # the index_pre
+    # breakpoint_score list will hold the indices just before the change.
     index_prebreakpoint_score = []
     previous_score = sorted_score_hgvs_pairs[0][0]
+    print(sorted_score_hgvs_pairs)
     for i in range(len(sorted_score_hgvs_pairs)):
         score = sorted_score_hgvs_pairs[i][0]
         if previous_score != score:
@@ -205,22 +210,34 @@ def calculate_coordinates(predictor_score_dict, benchmark_dict, out_filepath):
     # Add index of the last score (for the last coordinate)
     index_prebreakpoint_score.append(len(sorted_score_hgvs_pairs) - 1)
 
-    # Iterate over HGVS IDs of SNPs and corresponding sorted predictor scores
     for i in range(len(sorted_score_hgvs_pairs)):
         score = sorted_score_hgvs_pairs[i][0]
         hgvs = sorted_score_hgvs_pairs[i][1]
 
-        #########################
-        ### START CODING HERE ###
-        #########################
-        # Determine whether the SNP is classified by the benchmark as:
-        #    Pathogenic -> actual negative, thus a false positive (x-coordinate)
-        #    Benign  -> actual positive, thus a true positive (y-coordinate)
+        # Check the SNP's classification and update the counters
+        if benchmark_dict[hgvs] == "Pathogenic":
+            num_tp += 1
+        elif benchmark_dict[hgvs] == "Benign":
+            num_fp += 1
 
-        # Increase the respective value of num_benign or num_pathogenic
+        # Check if the current index i is a breakpoint (i.e., before a score change)
+        # print(index_prebreakpoint_score)
+        if i in index_prebreakpoint_score:
+            TPR = num_fp / total_n
+            FPR = num_tp / total_p
+
+            tpr.append(TPR)
+            fpr.append(FPR)
+            coordinate_score.append(score)
+
+        # Determine whether the SNP is classified by the benchmark as:
+        #    Pathogenic -> actual positive, thus a true positive (y-coordinate)
+        #    Benign     -> actual negative, thus a false positive (x-coordinate)
+
+        # Increase the respective value of num_fp or num_tp
 
         # Now, you need to calculate TPR and FPR for unique scores as TP/P and FP/N, respectively,
-        # using num_benign, num_pathogenic, total_benign, and total_pathogenic correctly. Append the values
+        # using num_fp, num_tp, total_n, and total_p correctly. Append the values
         # to the corresponding lists: tpr is a list of y-coordinates and fpr is a list of x-coordinates.
         # Calculate the rates if HGVS score index i is the index of the score before a breakpoint
         # (use index_prebreakpoint_score). Also, append the score to coordinate_score.
