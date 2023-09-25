@@ -2,7 +2,7 @@
 
 Command generate ROC plot for one score - *example polyphen*
 
-`python3 skeleton_script_create_roc_plot.py -ibench data/HGVS_2020_small_benchmark.tsv -ipred data/vep/HGVS_2020_small_polyphen_scores.tsv -color output/ROCplot_HGVS_2020_small_polyphen.png`
+`python3 skeleton_script_create_roc_plot.py -ibench data/HGVS_2020_benchmark.tsv -ipred data/vep/HGVS_2020_small_polyphen_scores.tsv -color -o output/ROCplot_HGVS_2020_small_polyphen.png`
 
 Command to generate ROC plot for all scores
 
