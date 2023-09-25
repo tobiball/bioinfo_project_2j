@@ -271,7 +271,9 @@ def integrate(fpr, tpr):
         #########################
         ### START CODING HERE ###
         #########################
-        # Calculate AUC
+        width = cur_fpr - last_fpr
+        height_avg = (last_tpr + cur_tpr) / 2
+        auc += width * height_avg
 
         #########################
         ###  END CODING HERE  ###
