@@ -199,7 +199,6 @@ def calculate_coordinates(predictor_score_dict, benchmark_dict, out_filepath):
     # breakpoint_score list will hold the indices just before the change.
     index_prebreakpoint_score = []
     previous_score = sorted_score_hgvs_pairs[0][0]
-    print(sorted_score_hgvs_pairs)
     for i in range(len(sorted_score_hgvs_pairs)):
         score = sorted_score_hgvs_pairs[i][0]
         if previous_score != score:
