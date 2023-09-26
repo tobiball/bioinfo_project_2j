@@ -169,8 +169,8 @@ def calculate_coordinates(predictor_score_dict, benchmark_dict, out_filepath):
     # Use the following if-statement and replace the question mark with the type of the predictor.
     # It will put the ROC curve at the correct side of the diagonal line.
 
-    if type_predictor == "sift" :
-        sorted_score_hgvs_pairs = sorted(score_hgvs_pairs, reverse=True)
+    if type_predictor == "polyphen":
+        sorted_score_hgvs_pairs = sorted(score_hgvs_pairs, reverse = True)
     else:
         sorted_score_hgvs_pairs = sorted(score_hgvs_pairs)
 
@@ -222,8 +222,8 @@ def calculate_coordinates(predictor_score_dict, benchmark_dict, out_filepath):
         # Check if the current index i is a breakpoint (i.e., before a score change)
         # print(index_prebreakpoint_score)
         if i in index_prebreakpoint_score:
-            TPR = num_fp / total_n
-            FPR = num_tp / total_p
+            FPR = num_fp / total_n
+            TPR = num_tp / total_p
 
             tpr.append(TPR)
             fpr.append(FPR)
