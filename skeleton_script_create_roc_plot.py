@@ -162,21 +162,12 @@ def calculate_coordinates(predictor_score_dict, benchmark_dict, out_filepath):
 
     sorted_score_hgvs_pairs = score_hgvs_pairs
 
-    #########################
-    ### START CODING HERE ###
-    #########################
-    # You need to sort the scores in the correct order for the ROC plot.
-    # Use the following if-statement and replace the question mark with the type of the predictor.
-    # It will put the ROC curve at the correct side of the diagonal line.
-
+    # Sort the predictor scores based on the type of predictor to position the ROC curve correctly.
+    # For 'polyphen', scores need to be sorted in descending order, while for others, it should be in ascending order.
     if type_predictor == "polyphen":
-        sorted_score_hgvs_pairs = sorted(score_hgvs_pairs, reverse = True)
+        sorted_score_hgvs_pairs = sorted(score_hgvs_pairs, reverse=True)
     else:
         sorted_score_hgvs_pairs = sorted(score_hgvs_pairs)
-
-    #########################
-    ###  END CODING HERE  ###
-    #########################
 
     # Later, each coordinate in the ROC plot will be associated with a predictor score (a threshold score). Thus, we
     # need a separate list for predictor scores
@@ -267,16 +258,12 @@ def integrate(fpr, tpr):
     last_tpr = tpr[0]
 
     for cur_fpr, cur_tpr in list(zip(fpr, tpr))[1:]:
-        #########################
-        ### START CODING HERE ###
-        #########################
+        # Calculate the area under the curve (AUC) using the trapezoidal rule.
+        # For each segment, use the average height (last_tpr and cur_tpr) and the width (difference in FPRs).
         width = cur_fpr - last_fpr
         height_avg = (last_tpr + cur_tpr) / 2
         auc += width * height_avg
 
-        #########################
-        ###  END CODING HERE  ###
-        #########################
         last_fpr = cur_fpr
         last_tpr = cur_tpr
 
