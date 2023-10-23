@@ -197,45 +197,30 @@ def calculate_coordinates(predictor_score_dict, benchmark_dict, out_filepath):
             index_prebreakpoint_score.append(i - 1)
         previous_score = score
 
-    # Add index of the last score (for the last coordinate)
+    # Add the index of the last score to mark it for calculating ROC coordinates.
     index_prebreakpoint_score.append(len(sorted_score_hgvs_pairs) - 1)
 
     for i in range(len(sorted_score_hgvs_pairs)):
         score = sorted_score_hgvs_pairs[i][0]
         hgvs = sorted_score_hgvs_pairs[i][1]
 
-        # Check the SNP's classification and update the counters
+        # Update the true positive and false positive counters based on the SNP's benchmark classification.
         if benchmark_dict[hgvs] == "Pathogenic":
             num_tp += 1
         elif benchmark_dict[hgvs] == "Benign":
             num_fp += 1
 
-        # Check if the current index i is a breakpoint (i.e., before a score change)
-        # print(index_prebreakpoint_score)
+        # Calculate ROC coordinates if the current score is a unique threshold (a breakpoint).
         if i in index_prebreakpoint_score:
+            # Compute the False Positive Rate (FPR) and True Positive Rate (TPR) for the current threshold.
             FPR = num_fp / total_n
             TPR = num_tp / total_p
 
+            # Append the calculated FPR, TPR, and the score to their respective lists.
             tpr.append(TPR)
             fpr.append(FPR)
             coordinate_score.append(score)
 
-        # Determine whether the SNP is classified by the benchmark as:
-        #    Pathogenic -> actual positive, thus a true positive (y-coordinate)
-        #    Benign     -> actual negative, thus a false positive (x-coordinate)
-
-        # Increase the respective value of num_fp or num_tp
-
-        # Now, you need to calculate TPR and FPR for unique scores as TP/P and FP/N, respectively,
-        # using num_fp, num_tp, total_n, and total_p correctly. Append the values
-        # to the corresponding lists: tpr is a list of y-coordinates and fpr is a list of x-coordinates.
-        # Calculate the rates if HGVS score index i is the index of the score before a breakpoint
-        # (use index_prebreakpoint_score). Also, append the score to coordinate_score.
-
-
-        #########################
-        ###  END CODING HERE  ###
-        #########################
     if out_filepath:
         out_dir, out_filename = os.path.split(out_filepath)
         # Write coordinates to a .tsv file
