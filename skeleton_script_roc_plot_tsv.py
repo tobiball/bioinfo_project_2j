@@ -83,14 +83,12 @@ def integrate(fpr, tpr):
     last_tpr = tpr[0]
 
     for cur_fpr, cur_tpr in list(zip(fpr, tpr))[1:]:
-        #########################
-        ### START CODING HERE ###
-        #########################
-        # Just copy and paste the code lines which you have completed in skeleton_script_create_roc_plot.py
+        # Calculate the area under the curve (AUC) using the trapezoidal rule.
+        # For each segment, use the average height (last_tpr and cur_tpr) and the width (difference in FPRs).
+        width = cur_fpr - last_fpr
+        height_avg = (last_tpr + cur_tpr) / 2
+        auc += width * height_avg
 
-        #########################
-        ###  END CODING HERE  ###
-        #########################
         last_fpr = cur_fpr
         last_tpr = cur_tpr
 
